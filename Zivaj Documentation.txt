@@ -1,0 +1,245 @@
+
+Google Login:
+https://rnfirebase.io/auth/social-auth
+
+
+Facebook Login:
+Code and youtube link given below follow both of these link:
+
+Link:
+https://youtu.be/fDK7N82Szho?si=Rp1cMzux637IfI-D
+
+Code:
+import { LoginManager, AccessToken, LoginButton, GraphRequest, GraphRequestManager } from 'react-native-fbsdk-next';
+
+<LoginButton
+            style={{
+              width: '100%',
+              backgroundColor: '#416FC0',
+              alignSelf: 'center',
+              borderRadius: responsiveWidth(2),
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingHorizontal: 20,
+              paddingVertical: responsiveFontSize(2),
+              marginBottom: 5,
+
+            }}
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  console.log("login has error: " + result.error);
+                  setVisible(true)
+                } else if (result.isCancelled) {
+                  console.log("login is cancelled.");
+                  setVisible(true)
+                } else {
+
+                  AccessToken.getCurrentAccessToken().then(
+                    (data) => {
+                      let accessToken = data.accessToken
+
+                      const responseInfoCallback = async (error, result) => {
+                        if (error) {
+                          console.log(error)
+                          alert('Error fetching data: ' + error.toString());
+                          setVisible(true)
+                        } else {
+                          console.log(result)
+
+                          setVisible(true)
+
+
+                          const params = {
+                            'email': result?.email,
+                          }
+
+                          console.log(params, '====================>my param')
+
+
+                          await fetch(`${api_url}/login/googleCreate`, {
+                            method: 'POST',
+                            headers: {
+                              // 'Accept': 'application/json',
+                              'Content-Type': 'application/json',
+                              // 'Content-Type': 'multipart/form-data',
+                            },
+                            body: JSON.stringify(params),
+                          }).then(response => response.json()).then(async (data) => {
+                            console.log(data)
+                            if (data.status === 'ok') {
+                              showToast('success', data?.message);
+                              setVisible(false)
+                              storeId(data?.data?.id,data?.data?.status)
+                              navigation.replace('home')
+
+                            } else if (data.status === 'register') {
+
+
+
+                              showToast('success', 'Facebook authentication successful')
+                              navigation.navigate('profileFor', { email: result?.email, phone: '' })
+
+
+                              setVisible(false)
+
+
+
+                            }
+                          })
+
+                        }
+                      }
+
+                      const infoRequest = new GraphRequest(
+                        '/me',
+                        {
+                          accessToken: accessToken,
+                          parameters: {
+                            fields: {
+                              string: 'email,name,first_name,middle_name,last_name'
+                            }
+                          }
+                        },
+                        responseInfoCallback
+                      );
+
+                      // Start the graph request.
+                      new GraphRequestManager().addRequest(infoRequest).start()
+
+                    }
+                  )
+
+                }
+              }
+            }
+            onLogoutFinished={() => alert("logout.")} />
+
+
+
+
+
+
+
+
+
+
+
+
+Audio Video Call:
+
+Use this code in main file where routing define or in app.js file and second use this code where u are implement audio video call. But must paste this code in app.js
+
+Link:
+https://docs.zegocloud.com/article/15778
+
+
+Code:
+
+import * as ZIM from 'zego-zim-react-native';
+import * as ZPNs from 'zego-zpns-react-native';
+import ZegoUIKitPrebuiltCallService, {
+  ZegoCallInvitationDialog,
+  ZegoUIKitPrebuiltCallWaitingScreen,
+  ZegoUIKitPrebuiltCallInCallScreen,
+  ZegoSendCallInvitationButton,
+  ZegoMenuBarButtonName,
+  ZegoUIKitPrebuiltCallFloatingMinimizedView,
+} from '@zegocloud/zego-uikit-prebuilt-call-rn';
+
+      ZegoUIKitPrebuiltCallService.init(
+        578362321,
+        '5d1024e91a8474af89d5f3f9a1a116c354c5ca3f53ea2830ddab4e04a4f967d1',
+        'zivaj'+chatId,
+        chatName,
+        [ZIM,ZPNs],
+        {
+          ringtoneConfig: {
+            incomingCallFileName: require('./IPhone Call Tone.mp3'),
+            outgoingCallFileName: require('./Msn Outgoing Ctone.mp3'),
+          },
+          requireConfig: (data) => {
+            return {
+              durationConfig: {
+                isVisible: true,
+                onDurationUpdate: (duration) => {
+                  console.log('########CallWithInvitation onDurationUpdate', duration);
+                  if (duration === 10 * 60) {
+                    ZegoUIKitPrebuiltCallService.hangUp();
+                  }
+                }
+              },
+              topMenuBarConfig: {
+                buttons: [
+                  ZegoMenuBarButtonName.minimizingButton,
+                ],
+              },
+              onWindowMinimized: () => {
+                console.log('[Demo]CallInvitation onWindowMinimized');
+                props.navigation.navigate('HomeScreen');
+              },
+              onWindowMaximized: () => {
+                console.log('[Demo]CallInvitation onWindowMaximized');
+                props.navigation.navigate('ZegoUIKitPrebuiltCallInCallScreen');
+              },
+            }
+          }
+        }
+      );
+
+
+
+
+
+Stripe Payment:
+
+Frontend Integration:
+
+In app.js add this stripe provider:
+import { StripeProvider } from '@stripe/stripe-react-native';
+const publishableKey = publishKey;
+
+<StripeProvider publishableKey={publishableKey}>
+        <MainNav />
+ </StripeProvider>
+
+Where u add payment method add this code:
+
+import { CardField, useConfirmPayment, useStripe, BillingDetails } from '@stripe/stripe-react-native';
+const { confirmPayment, loading } = useConfirmPayment();
+
+This client secret from backend api response first call api then in there response paste this code 
+// Confirm the payment with the card details
+        const { paymentIntent, error } = await confirmPayment(data.client_secret, {
+          paymentMethodType: 'Card',
+          paymentMethodData: {
+            billingDetails,
+          },
+        });
+
+
+
+Backend Integration:
+
+
+const Stripe = require('stripe')
+// const User = db.user;
+
+// main work
+
+const stripe = new Stripe(Secret key)
+
+
+const paymentIntent = await stripe.paymentIntents.create({
+            amount: price,
+            currency: 'usd',
+            automatic_payment_methods: {
+                enabled: true,
+              },
+          });
+
+          res.status(200).json({
+            status: 'ok',
+            client_secret: paymentIntent.client_secret
+        })

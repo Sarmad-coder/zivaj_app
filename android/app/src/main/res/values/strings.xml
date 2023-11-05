@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Zivaj</string>
+    
+<string name="facebook_app_id">617402340378924</string>
+<string name="fb_login_protocol_scheme">fb1234</string>
+<string name="facebook_client_token">bf15404d1116b3663cbbe791c3f4f751</string>
+
+
+    
+
+</resources>
